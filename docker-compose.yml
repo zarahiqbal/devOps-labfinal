@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./api
+    ports:
+      - "5000:5000"
+    volumes:
+      - sqlite-data:/app/database
+    networks:
+      - app-network
+
+  frontend:
+    build: ./client
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  sqlite-data:
+
+networks:
+  app-network:
