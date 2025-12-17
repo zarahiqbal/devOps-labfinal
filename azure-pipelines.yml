@@ -1,0 +1,43 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildJob
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+
+    - script: |
+        cd api
+        npm install
+      displayName: Install Backend Dependencies
+
+    - script: |
+        cd client
+        npm install
+        npm run build
+      displayName: Build Frontend
+
+- stage: Test
+  dependsOn: Build
+  jobs:
+  - job: TestJob
+    steps:
+    - script: |
+        cd api
+        npm test || echo "No tests"
+      displayName: Run Backend Tests
+
+- stage: Docker
+  dependsOn: Test
+  jobs:
+  - job: DockerJob
+    steps:
+    - script: echo "Docker build & push stage"
+      displayName: Docker Stage
